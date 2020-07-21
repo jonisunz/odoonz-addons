@@ -2,12 +2,13 @@
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 import mock
-from odoo.addons.account.tests.test_account_supplier_invoice import (
-    TestAccountSupplierInvoice,
+
+from odoo.addons.account.tests.test_account_incoming_supplier_invoice import (
+    TestAccountIncomingSupplierInvoice,
 )
 
 
-class TestSupplierTaxRounding(TestAccountSupplierInvoice):
+class TestSupplierTaxRounding(TestAccountIncomingSupplierInvoice):
     def setUp(self):
         super().setUp()
         self.company = self.env.ref("base.main_company")
@@ -60,15 +61,15 @@ class TestSupplierTaxRounding(TestAccountSupplierInvoice):
             "odoo.addons.account.models.account.round", autospec=True
         ) as mock_round:
             mock_round.return_value = 10.0
-            invoice = self.env["account.invoice"].create(
+            invoice = self.env["account.move"].create(
                 {
                     "partner_id": self.env.ref("base.res_partner_2").id,
-                    "account_id": self.invoice_account,
+                    "id": self.invoice_account,
                     "type": "in_invoice",
                 }
             )
 
-            self.env["account.invoice.line"].create(
+            self.env["account.move.line"].create(
                 {
                     "product_id": self.env.ref("product.product_product_4").id,
                     "quantity": 1.0,
@@ -76,7 +77,7 @@ class TestSupplierTaxRounding(TestAccountSupplierInvoice):
                     "invoice_id": invoice.id,
                     "name": "product that cost 100",
                     "account_id": self.invoice_line_account,
-                    "invoice_line_tax_ids": [(6, 0, [tax.id])],
+                    "tax_ids": [(6, 0, [tax.id])],
                 }
             )
             # Note rounding of tax isn't actually called in round per line
@@ -102,15 +103,15 @@ class TestSupplierTaxRounding(TestAccountSupplierInvoice):
             "odoo.addons.account.models.account.round", autospec=True
         ) as mock_round:
             mock_round.return_value = 10.0
-            invoice = self.env["account.invoice"].create(
+            invoice = self.env["account.move"].create(
                 {
                     "partner_id": self.env.ref("base.res_partner_2").id,
-                    "account_id": self.invoice_account,
+                    "id": self.invoice_account,
                     "type": "in_invoice",
                 }
             )
 
-            self.env["account.invoice.line"].create(
+            self.env["account.move.line"].create(
                 {
                     "product_id": self.env.ref("product.product_product_4").id,
                     "quantity": 1.0,
@@ -118,7 +119,7 @@ class TestSupplierTaxRounding(TestAccountSupplierInvoice):
                     "invoice_id": invoice.id,
                     "name": "product that cost 100",
                     "account_id": self.invoice_line_account,
-                    "invoice_line_tax_ids": [(6, 0, [tax.id])],
+                    "tax_ids": [(6, 0, [tax.id])],
                 }
             )
             mock_round.assert_called_with(10.0, 7)
