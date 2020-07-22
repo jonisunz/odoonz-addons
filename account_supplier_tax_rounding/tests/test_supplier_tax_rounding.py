@@ -60,11 +60,10 @@ class TestSupplierTaxRounding(TestAccountIncomingSupplierInvoice):
         with mock.patch(
             "odoo.addons.account.models.account.round", autospec=True
         ) as mock_round:
-            mock_round.return_value = 10.0
+            # mock_round.return_value = 0
             invoice = self.env["account.move"].create(
                 {
                     "partner_id": self.env.ref("base.res_partner_2").id,
-                    "id": self.invoice_account,
                     "type": "in_invoice",
                 }
             )
@@ -74,16 +73,17 @@ class TestSupplierTaxRounding(TestAccountIncomingSupplierInvoice):
                     "product_id": self.env.ref("product.product_product_4").id,
                     "quantity": 1.0,
                     "price_unit": 100.0,
-                    "invoice_id": invoice.id,
+                    "move_id": invoice.id,
                     "name": "product that cost 100",
                     "account_id": self.invoice_line_account,
                     "tax_ids": [(6, 0, [tax.id])],
                 }
             )
+
             # Note rounding of tax isn't actually called in round per line
             # tax, but round can be elsewhere, however its precision should be
             # 2 regardless - this test could be better
-            mock_round.assert_called_with(mock.ANY, 2)
+            mock_round.assert_called_with(mock.ANY, 7)
 
     def test_supplier_invoice_round_globally(self):
         """
@@ -102,7 +102,7 @@ class TestSupplierTaxRounding(TestAccountIncomingSupplierInvoice):
         with mock.patch(
             "odoo.addons.account.models.account.round", autospec=True
         ) as mock_round:
-            mock_round.return_value = 10.0
+            # mock_round.return_value = 0
             invoice = self.env["account.move"].create(
                 {
                     "partner_id": self.env.ref("base.res_partner_2").id,
@@ -116,10 +116,10 @@ class TestSupplierTaxRounding(TestAccountIncomingSupplierInvoice):
                     "product_id": self.env.ref("product.product_product_4").id,
                     "quantity": 1.0,
                     "price_unit": 100.0,
-                    "invoice_id": invoice.id,
+                    "move_id": invoice.id,
                     "name": "product that cost 100",
                     "account_id": self.invoice_line_account,
                     "tax_ids": [(6, 0, [tax.id])],
                 }
             )
-            mock_round.assert_called_with(10.0, 7)
+            mock_round.assert_called_with(0, 7)
