@@ -15,7 +15,7 @@ class AccountInvoice(models.Model):
         """
         return self.commercial_partner_id
 
-    @api.onchange("invoice_date")
+    @api.onchange("invoice_payment_term_id", "invoice_date")
     def _onchange_invoice_date(self):
         """
         Extends the onchange to assign the invoice date based on the partners
