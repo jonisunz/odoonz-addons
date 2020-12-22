@@ -5,7 +5,6 @@ from odoo import api, models
 from odoo.exceptions import AccessError
 from odoo.osv import expression
 
-
 class AccountReconciliationWidget(models.AbstractModel):
     _inherit = "account.reconciliation.widget"
 
@@ -45,9 +44,8 @@ class AccountReconciliationWidget(models.AbstractModel):
         return new_res
 
     @api.model
-    def _domain_move_lines_for_reconciliation(
-        self, st_line, aml_accounts, partner_id, excluded_ids=None, search_str=False
-    ):
+    def _domain_move_lines_for_manual_reconciliation(self, account_id, partner_id=False, excluded_ids=None,
+                                                     search_str=''):
         account_type_filter = expression.OR(
             [
                 [("account_id.name", "=", "Liquidity Transfer")],
@@ -63,9 +61,8 @@ class AccountReconciliationWidget(models.AbstractModel):
         domain = expression.AND(
             [
                 account_type_filter,
-                super()._domain_move_lines_for_reconciliation(
-                    st_line,
-                    aml_accounts,
+                super()._domain_move_lines_for_manual_reconciliation(
+                    account_id,
                     partner_id,
                     excluded_ids=excluded_ids,
                     search_str=search_str,
